@@ -5,11 +5,11 @@ import uvicorn
 
 app = FastAPI()
 
-# Load Word2Vec models
+
 model1 = Word2Vec.load("word2vec_model1_2016.model")
 model2 = Word2Vec.load("word2vec_model_2024.model")
 
-# Initialize Jinja2Templates
+
 templates = Jinja2Templates(directory="templates")
 
 
@@ -30,6 +30,8 @@ async def home(request: Request):
 
 @app.get("/similar/{model_id}/{word}")
 async def find_similar_words(model_id: int, word: str):
+    word = word.lower()  
+
     if model_id == 1:
         result = get_similar_words(model1, word)
     elif model_id == 2:
