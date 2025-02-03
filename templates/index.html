@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Similarity Finder</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 50px;
+      }
+
+      input {
+        padding: 8px;
+        margin: 10px;
+      }
+
+      button {
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Word Similarity Finder</h1>
+    <form id="similar-form">
+      <label for="model_id">Choose Model:</label>
+      <select id="model_id" name="model_id">
+        <option value="1">Model 2016</option>
+        <option value="2">Model 2024</option>
+      </select>
+      <input type="text" id="word" name="word" placeholder="Enter a word" required />
+      <button type="button" onclick="findSimilarWords()">Find Similar Words</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+      async function findSimilarWords() {
+        const modelId = document.getElementById("model_id").value;
+        const word = document.getElementById("word").value;
+
+        if (word.trim() === "") {
+          alert("Please enter a word.");
+          return;
+        }
+
+        try {
+          const response = await fetch(`/similar/${modelId}/${word}`);
+          console.log(response);
+          if (!response.ok) {
+            throw new Error("Word not found in the vocabulary.");
+          }
+
+          const data = await response.json();
+          displayResult(data);
+        } catch (error) {
+          document.getElementById("result").innerHTML = `<p style="color: red;">${error.message}</p>`;
+        }
+      }
+
+      function displayResult(data) {
+        const resultDiv = document.getElementById("result");
+        if (!data.similar_words) {
+          resultDiv.innerHTML = `<p>No similar words found for "${data.word}".</p>`;
+          return;
+        }
+
+        let html = `<h2>Similar words for: "${data.word}"</h2><ul>`;
+        data.similar_words.forEach(([word, similarity]) => {
+          html += `<li>${word} (${similarity.toFixed(3)})</li>`;
+        });
+        html += `</ul>`;
+        resultDiv.innerHTML = html;
+      }
+    </script>
+  </body>
+</html>

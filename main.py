@@ -1,6 +1,6 @@
 from gensim.models import Word2Vec
-from IPython.display import display, clear_output
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.templating import Jinja2Templates
 import uvicorn
 
 app = FastAPI()
@@ -8,13 +8,22 @@ app = FastAPI()
 model1 = Word2Vec.load("word2vec_model1_2016.model")
 model2 = Word2Vec.load("word2vec_model_2024.model")
 
+templates = Jinja2Templates(directory="templates")
+
 
 def get_similar_words(model, word):
     try:
         similar = model.wv.most_similar(word, topn=10)
         return similar
     except KeyError:
-        return f"'{word}' not found in the vocabulary."
+        return None
+
+
+@app.get("/")
+async def home(request: Request):
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "result": None}
+    )
 
 
 @app.get("/similar/{model_id}/{word}")
