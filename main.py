@@ -8,6 +8,13 @@ app = FastAPI()
 model1 = Word2Vec.load("word2vec_model1_2016.model")
 model2 = Word2Vec.load("word2vec_model_2024.model")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
 
 def get_similar_words(model, word):
     try:
